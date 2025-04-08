@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { signInWithGoogle, supabase } from './supabase'
+import { signInWithGoogle, signOut, supabase } from './supabase'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref()
