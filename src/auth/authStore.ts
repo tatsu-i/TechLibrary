@@ -1,11 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { signInWithGoogle, signOut, supabase } from './supabase'
+import { signInWithGoogle, signOut, signUp, supabase } from './supabase'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref()
   const loading = ref(true)
   const error = ref()
+  const initializeError = ref()
+  const logoutError = ref()
 
   const initialize = async () => {
     loading.value = true
@@ -14,7 +16,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (userError) throw userError
       user.value = data.user
     } catch (err) {
-      error.value = err
+      initializeError.value = err
       user.value = null
     } finally {
       loading.value = false
@@ -33,6 +35,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const signUpWithPassword = async (email, password) => {
+    loading.value = true
+    try {
+      const { error: signUpError } = await signUp(email, password)
+      if (signUpError) throw signUpError
+    } catch (err) {
+      error.value = err
+    } finally {
+      loading.value = false
+    }
+  }
+
   const logout = async () => {
     loading.value = true
     error.value = null
@@ -41,7 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
       if (signOutError) throw signOutError
       user.value = null
     } catch (err) {
-      error.value = err
+      logoutError.value = err
     } finally {
       loading.value = false
     }
@@ -55,9 +69,12 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     loading,
+    initializeError,
     error,
+    logoutError,
     initialize,
     loginWithGoogle,
+    signUpWithPassword,
     logout,
   }
 })

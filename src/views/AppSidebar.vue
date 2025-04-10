@@ -13,10 +13,25 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { Bookmark, Clock4, Home, Library, TrendingUp } from 'lucide-vue-next'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/auth/authStore'
 
 const route = useRoute()
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLoginLogout = () => {
+  if (authStore.user) {
+    authStore.logout()
+  } else {
+    router.push('/login')
+  }
+}
+
+const handleSignUp = () => {
+  router.push('/signup')
+}
 
 const mainItems = [
   {
@@ -90,10 +105,11 @@ const libraryItems = [
             <SidebarMenuItem v-for="libraryItem in libraryItems" :key="libraryItem.title">
               <SidebarMenuButton asChild>
                 <RouterLink
-                  :to="libraryItem.url"
+                  :to="authStore.user ? libraryItem.url : '/login'"
                   :class="
                     cn(
                       'flex items-center gap-3 px-3 py-5 rounded-md text-sm transition-colors',
+                      authStore.user ? '' : 'opacity-50',
                       route.path === libraryItem.url
                         ? 'bg-primary/10 text-primary font-medium hover:bg-primary/10 hover:text-primary'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted',
@@ -110,8 +126,12 @@ const libraryItems = [
       </SidebarGroup>
     </SidebarContent>
     <SidebarFooter>
-      <Button class="py-5">ログイン</Button>
-      <Button variant="outline" class="py-5"> アカウント作成 </Button>
+      <Button @click="handleLoginLogout" class="py-5">{{
+        authStore.user ? 'ログアウト' : 'ログイン'
+      }}</Button>
+      <Button @click="handleSignUp" :disabled="authStore.user" variant="outline" class="py-5">{{
+        authStore.user ? 'アカウント作成済み' : 'アカウント作成'
+      }}</Button>
     </SidebarFooter>
   </Sidebar>
 </template>

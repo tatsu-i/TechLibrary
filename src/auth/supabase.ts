@@ -16,6 +16,14 @@ export const signInWithGoogle = async () => {
   return { data, error }
 }
 
+export const signUp = async (email, password) => {
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+  })
+  return { error }
+}
+
 export const signOut = async () => {
   const { error } = await supabase.auth.signOut()
   return { error }
